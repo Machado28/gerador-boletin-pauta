@@ -1,4 +1,6 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { useState } from 'react';
 import {
   MDBBtn,
@@ -11,49 +13,42 @@ import {
   MDBInput,
 } from 'mdb-react-ui-kit';
 import { Link } from 'react-router-dom';
-import * as auth from '../../services/auth';
-import { schema } from '../../Validations/Login';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 
-function Login(props) {
+function Convidar({ match }) {
   const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-
-  const handleEmail = e => {
-    setEmail(e.target.value);
-  };
-  const handleSenha = e => {
-    setSenha(e.target.value);
-  };
+  const [curso, setCurso] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    PostData({ email, senha });
+    PostData({ email, curso});
   }
 
-  const notify = () => {
-    toast.error('Email ou Password Inválido.!');
+  const handleEmail = e => {
+    setEmail(e.target.value);
   };
+  const handleCurso = e => {
+    setCurso(e.target.value);
+  };
+  const { token } = match.params;
 
   async function PostData(data) {
     const response = await api
-      .post('/signin', data)
+      .post(`/convidar/usuario`, data)
       .then(res => {
-        if (res.status === 200) {
-          auth.login(res.data.token);
-          auth.UserLogado(res.data.usuario_activo);
-          window.location.href = '/';
-        }
+        if (res.status === 201) alert(res.data.message);
+        window.location.href = '/';
       })
       .catch(({ response }) => {
         console.warn(response);
         alert(response.data.error);
-
+        window.location.href = '/usuarios';
         notify(response.data.error);
       });
   }
+
   return (
     <MDBContainer className="my-5">
       <MDBCard>
@@ -70,7 +65,7 @@ function Login(props) {
             <MDBCardBody className="d-flex flex-column">
               <div className="d-flex flex-row mt-2">
                 <span className="h1 fw-bold mb-0">
-                  BEM VINDO AO GERADOR DE BOLETIN IMIL
+                  INSIRAR OS EMAIL DOS USUARIO PERMITOS PARA O USO DA APLICAÇÃO
                 </span>
               </div>
 
@@ -78,7 +73,7 @@ function Login(props) {
                 className="fw-normal my-4 pb-3"
                 style={{ letterSpacing: '1px' }}
               >
-                iniciar sessão
+               defina quem pode acessar a aplicação
               </h5>
               <form onSubmit={handleSubmit}>
                 <MDBInput
@@ -88,18 +83,20 @@ function Login(props) {
                   type="email"
                   size="lg"
                   name="email"
+                  required
                   onChange={handleEmail}
                   value={email}
                 />
                 <MDBInput
                   wrapperClass="mb-4"
-                  label="Password"
+                  label="Curso"
                   id="formControlLg"
-                  type="password"
+                  type="text"
                   size="lg"
-                  name="senha"
-                  onChange={handleSenha}
-                  value={senha}
+                  required
+                  name="curso"
+                  onChange={handleCurso}
+                  value={curso}
                 />
 
                 <MDBBtn
@@ -108,12 +105,10 @@ function Login(props) {
                   size="lg"
                   type="submit"
                 >
-                  Login
+                  Convidar
                 </MDBBtn>
               </form>
-              <Link className="small text-muted" to="/signup">
-                Criar conta
-              </Link>
+            
               <p className="mb-5 pb-lg-2" style={{ color: '#393f81' }}></p>
 
               <div className="d-flex flex-row justify-content-start">
@@ -132,4 +127,4 @@ function Login(props) {
   );
 }
 
-export default Login;
+export default Convidar;

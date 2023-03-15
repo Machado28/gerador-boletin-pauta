@@ -16,21 +16,29 @@ import { schema } from '../../Validations/Login';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 
-function Login(props) {
+function Signup(props) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [nome_completo, setNomeCompleto] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
 
   const handleEmail = e => {
     setEmail(e.target.value);
   };
+  const handleConfirmarSenha = e => {
+    setConfirmarSenha(e.target.value);
+  };
   const handleSenha = e => {
     setSenha(e.target.value);
+  };
+  const handleNomeCompleto = e => {
+    setNomeCompleto(e.target.value);
   };
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    PostData({ email, senha });
+    PostData({ nome_completo, email, senha, confirmarSenha });
   }
 
   const notify = () => {
@@ -39,18 +47,18 @@ function Login(props) {
 
   async function PostData(data) {
     const response = await api
-      .post('/signin', data)
+      .post('/signup', data)
       .then(res => {
-        if (res.status === 200) {
-          auth.login(res.data.token);
-          auth.UserLogado(res.data.usuario_activo);
+        if (res.status === 201) {
+          console.warn(res.data.mensagem);
+          alert(res.data.mensagem);
           window.location.href = '/';
         }
       })
       .catch(({ response }) => {
         console.warn(response);
         alert(response.data.error);
-
+        window.location.href = '/login';
         notify(response.data.error);
       });
   }
@@ -70,7 +78,7 @@ function Login(props) {
             <MDBCardBody className="d-flex flex-column">
               <div className="d-flex flex-row mt-2">
                 <span className="h1 fw-bold mb-0">
-                  BEM VINDO AO GERADOR DE BOLETIN IMIL
+                  CRIE UMA CONTA NO GERADOR DE BOLETIN IMIL
                 </span>
               </div>
 
@@ -78,9 +86,19 @@ function Login(props) {
                 className="fw-normal my-4 pb-3"
                 style={{ letterSpacing: '1px' }}
               >
-                iniciar sessão
+                Crie a sua conta com o email com que lhe foi convidado
               </h5>
               <form onSubmit={handleSubmit}>
+                <MDBInput
+                  wrapperClass="mb-4"
+                  label="Nome Completo"
+                  id="formControlLg"
+                  type="nome_completo"
+                  size="lg"
+                  name="nome_completo"
+                  onChange={handleNomeCompleto}
+                  value={nome_completo}
+                />
                 <MDBInput
                   wrapperClass="mb-4"
                   label="Email address"
@@ -93,13 +111,23 @@ function Login(props) {
                 />
                 <MDBInput
                   wrapperClass="mb-4"
-                  label="Password"
+                  label="Senha"
                   id="formControlLg"
                   type="password"
                   size="lg"
                   name="senha"
                   onChange={handleSenha}
                   value={senha}
+                />
+                <MDBInput
+                  wrapperClass="mb-4"
+                  label="Confrimar Senha"
+                  id="formControlLg"
+                  type="password"
+                  size="lg"
+                  name="confirmarsenha"
+                  onChange={handleConfirmarSenha}
+                  value={confirmarSenha}
                 />
 
                 <MDBBtn
@@ -108,11 +136,11 @@ function Login(props) {
                   size="lg"
                   type="submit"
                 >
-                  Login
+                  Criar Conta
                 </MDBBtn>
               </form>
-              <Link className="small text-muted" to="/signup">
-                Criar conta
+              <Link className="small text-muted" to="/login">
+                Já tenho uma conta
               </Link>
               <p className="mb-5 pb-lg-2" style={{ color: '#393f81' }}></p>
 
@@ -132,4 +160,4 @@ function Login(props) {
   );
 }
 
-export default Login;
+export default Signup;
